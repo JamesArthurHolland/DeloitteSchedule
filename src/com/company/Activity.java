@@ -22,6 +22,15 @@ public class Activity
         return clone;
     }
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Activity activity = (Activity) o;
+        return this.name == activity.name
+                && this.durationMinutes == activity.durationMinutes
+                && this.startTimeMinutesFromMidnight == activity.startTimeMinutesFromMidnight;
+    }
+
     public String getName() {
         return name;
     }

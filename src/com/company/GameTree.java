@@ -98,15 +98,20 @@ public class GameTree
     }
 
     // given a board layout, generate all the possible moves in a given round for it
-    public static Deque<Board> generateFutureSchedules(Schedule startingSchedule){
-        Board child;
+    public static Deque<Schedule> generateFutureSchedules(Schedule startingSchedule){
+        Schedule child;
 
-        Deque<Board> layouts = new LinkedList<>();
+        Deque<Schedule> layouts = new LinkedList<>();
 
-        for(int i = 0; i<7; i++) {
-            child = startingSchedule.clone();
+        ArrayList<Activity> remainingActivities = startingSchedule.getRemainingActivitiesForCurrentTeam();
 
-            if(child.makeMove(i) != -1){
+        for(int i = 0; i < remainingActivities.size(); i++) {
+            child = new Schedule(startingSchedule);
+
+            Activity activity = remainingActivities.get(i);
+            child.
+
+            if(child.makeMove(i) != -1) {
                 {
                     child.parentMove.add(i);
                     if(child.playerToMove == startingSchedule.playerToMove){
