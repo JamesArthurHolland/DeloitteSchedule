@@ -10,6 +10,8 @@ didn't align with the rules scored badly in the "evaluate" function in the Sched
 which meant the algorithm would explore other paths (that would have hopefully) better prospects.
 
 # Installation (Requires java8)
-    - `git clone https://github.com/JamesArthurHolland/DeloitteSchedule`
-    - `cd src/com/company`
-    - `javac *.java && java -classpath ../../ com.company.Main`
+```sh
+$ git clone https://github.com/JamesArthurHolland/DeloitteSchedule
+$ cd src/com/company
+$ javac *.java && java -classpath ../../ com.company.Main
+```
