@@ -1,12 +1,6 @@
 package com.company;
 
-import com.sun.org.apache.xerces.internal.dom.ChildNode;
-import sun.reflect.generics.tree.Tree;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Stack;
-import java.util.LinkedList;
 
 public class GameTree
 {
@@ -78,7 +72,6 @@ public class GameTree
         for(TreeNode tempNode : nextNodes(node)) {
             int temp = idaStarSearch(tempNode, g, threshold);
             if(temp == Schedule.FEASIBLE_SCHEDULE) {
-                // TODO callback function to handle printing of schedule
                 return Schedule.FEASIBLE_SCHEDULE;
             }
             if(temp < min) {

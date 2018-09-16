@@ -4,23 +4,26 @@ import java.util.*;
 
 public class Schedule
 {
-    // TODO mVariable naming
     private int numberOfTeams;
     private int teamToMove = 1;
     private int numberOfActivities;
+    private int shortestActivityTime;
     private HashMap<Integer, ArrayList<Activity>> remainingActivitiesForTeam;
     private HashMap<Integer, Itinerary> teamItineraries;
-    private TreeMap<String, TreeSet<Integer>> activityInUseTimes = new TreeMap<>();; // TODO no clashes
+    private TreeMap<String, TreeSet<Integer>> activityInUseTimes = new TreeMap<>();
 
     public static final int FEASIBLE_SCHEDULE = 0;
 
     public static final int START_OF_DAY = 540;
-    public static final int LUNCH_TIME = 715;
+    public static final int EARLIEST_LUNCH_TIME = 675;
+    public static final int LATEST_LUNCH_TIME = 720;
+    public static final int EARLIEST_MOTIVATION_TALK_TIME = 960;
+    public static final int LATEST_MOTIVATION_TALK_TIME = 1020;
+    public static final int EARLIEST_FINISH_TIME = 1020;
 
     public Schedule(int numberOfTeams, ArrayList<Activity> activities)
     {
         this.numberOfTeams = numberOfTeams;
-        this.teamToMove = teamToMove;
         this.numberOfActivities = activities.size();
         remainingActivitiesForTeam = new HashMap<>();
         activityInUseTimes = new TreeMap<>();
@@ -31,7 +34,11 @@ public class Schedule
         for(int i = 1; i <= numberOfTeams; i ++) {
             teamItineraries.put(new Integer(i), new Itinerary());
         }
+        shortestActivityTime = Integer.MAX_VALUE;
         for(Activity activity : activities) {
+            if(activity.getDurationMinutes() < shortestActivityTime) {
+                shortestActivityTime = activity.getDurationMinutes();
+            }
             activityInUseTimes.put(activity.getName(), new TreeSet<>());
         }
     }
@@ -82,11 +89,16 @@ public class Schedule
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Itinerary itinerary = (Itinerary) pair.getValue();
-            if(itinerary.currentTimeSlotMinutesFromMidnight > LUNCH_TIME && itinerary.timeOfActivity("Lunch") != LUNCH_TIME) {
+            if(itinerary.currentTimeSlotMinutesFromMidnight > LATEST_LUNCH_TIME && (itinerary.timeOfActivity("Lunch") < EARLIEST_LUNCH_TIME
+                    || itinerary.timeOfActivity("Lunch") == -1)) {
+                return GameTree.INFINITY;
+            }
+            if(itinerary.currentTimeSlotMinutesFromMidnight > LATEST_MOTIVATION_TALK_TIME && (itinerary.timeOfActivity("Staff Motivation Presentation") < EARLIEST_MOTIVATION_TALK_TIME
+                    || itinerary.timeOfActivity("Staff Motivation Presentation") == -1)) {
                 return GameTree.INFINITY;
             }
 
-            if(itinerary.activities.size() != numberOfActivities) {
+            if(itinerary.currentTimeSlotMinutesFromMidnight < EARLIEST_FINISH_TIME) {
                 scheduleFull = false;
             }
         }
@@ -114,7 +126,7 @@ public class Schedule
         return (teamToMove % numberOfTeams) + 1;
     }
 
-    public boolean isActivityFree(Activity activity) // TODO test
+    public boolean isActivityFree(Activity activity)
     {
         TreeSet<Integer> times = activityInUseTimes.get(activity.getName());
         Iterator it = times.iterator();
@@ -211,7 +223,7 @@ public class Schedule
                 Activity activity = (Activity) pair.getValue();
                 String hourOfActivity = "" + time / 60;
                 String minutesOfActivity = "" + time % 60;
-                System.out.println(activity.getName() + " " + hourOfActivity + ":" + minutesOfActivity + "----"  + time);
+                System.out.println(activity.getName() + " " + hourOfActivity + ":" + minutesOfActivity);
                 activities.put(time, activity);
             }
         }
