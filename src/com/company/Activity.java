@@ -4,7 +4,6 @@ public class Activity
 {
     final private String name;
     final private int durationMinutes;
-    private int startTimeMinutesFromMidnight;
 
     public Activity(String name, int durationMinutes) {
         this.name = name;
@@ -27,8 +26,7 @@ public class Activity
         if (o == null || getClass() != o.getClass()) return false;
         Activity activity = (Activity) o;
         return this.name == activity.name
-                && this.durationMinutes == activity.durationMinutes
-                && this.startTimeMinutesFromMidnight == activity.startTimeMinutesFromMidnight;
+                && this.durationMinutes == activity.durationMinutes;
     }
 
     public String getName() {
@@ -37,13 +35,5 @@ public class Activity
 
     public int getDurationMinutes() {
         return durationMinutes;
-    }
-
-    public int getStartTimeMinutesFromMidnight() {
-        return startTimeMinutesFromMidnight;
-    }
-
-    public void setStartTimeMinutesFromMidnight(int startTimeMinutesFromMidnight) {
-        this.startTimeMinutesFromMidnight = startTimeMinutesFromMidnight;
     }
 }

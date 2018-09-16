@@ -1,9 +1,6 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Schedule
 {
@@ -11,6 +8,9 @@ public class Schedule
     private int teamToMove = 1;
     private HashMap<Integer, ArrayList<Activity>> remainingActivitiesForTeam;
     private HashMap<Integer, Itinerary> teamItineraries;
+    private TreeMap<String, TreeSet<Integer>> activityInUseTimes; // TODO no clashes
+
+    public static final int FEASIBLE_SCHEDULE = 0;
 
     public Schedule(int numberOfTeams, ArrayList<Activity> activities)
     {
@@ -38,9 +38,42 @@ public class Schedule
         }
     }
 
+    public int evaluate()
+    {
+        return 1;
+    }
+
+    public boolean isActivityFree(Activity activity) // TODO test
+    {
+        TreeSet<Integer> times = activityInUseTimes.get(activity.getName());
+        Iterator it = times.iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            int startTime = (int) pair.getValue();
+            int finishTime = startTime + activity.getDurationMinutes();
+            int requestedTime = getCurrentInsertionTime();
+            if(requestedTime > startTime && requestedTime < finishTime) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int getCurrentInsertionTime()
+    {
+        return teamItineraries.get(teamToMove).getCurrentInsertionTime();
+    }
+
     public void addActivity(Activity activity)
     {
-        teamItineraries.get(teamToMove)
+        teamItineraries.get(teamToMove).addActivity(activity);
+        Iterator it = getRemainingActivitiesForCurrentTeam().iterator();
+        while (it.hasNext()) {
+            Activity currentActivity = (Activity) it;
+            if(currentActivity.getName().equals(activity.getName())) {
+                it.remove();
+            }
+        }
     }
 
     public ArrayList<Activity> getRemainingActivitiesForCurrentTeam() {
@@ -58,7 +91,7 @@ public class Schedule
     public class Itinerary
     {
         private ArrayList<Activity> activities;
-        private int currentTimeSlotMinutesFromMidnight;
+        private int currentTimeSlotMinutesFromMidnight = 0;
 
         public Itinerary(int startTimeMinutesFromMidnight) {
             this.activities = new ArrayList<>();
@@ -67,9 +100,13 @@ public class Schedule
 
         public void addActivity(Activity activity)
         {
-            activity.setStartTimeMinutesFromMidnight(currentTimeSlotMinutesFromMidnight);
             activities.add(activity);
             currentTimeSlotMinutesFromMidnight += activity.getDurationMinutes();
+        }
+
+        public int getCurrentInsertionTime()
+        {
+            return currentTimeSlotMinutesFromMidnight;
         }
     }
 }
