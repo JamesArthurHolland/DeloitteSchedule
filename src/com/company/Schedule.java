@@ -14,6 +14,9 @@ public class Schedule
 
     public static final int FEASIBLE_SCHEDULE = 0;
 
+    public static final int START_OF_DAY = 540;
+    public static final int LUNCH_TIME = 715;
+
     public Schedule(int numberOfTeams, ArrayList<Activity> activities)
     {
         this.numberOfTeams = numberOfTeams;
@@ -78,11 +81,10 @@ public class Schedule
         Iterator it = getTeamItineraries().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            int teamNumber = (int) pair.getKey();
             Itinerary itinerary = (Itinerary) pair.getValue();
-//            if(itinerary.timeOfActivity("Lunch") != -1 && itinerary.timeOfActivity("Lunch") != 715) {
-//                return GameTree.INFINITY;
-//            }
+            if(itinerary.currentTimeSlotMinutesFromMidnight > LUNCH_TIME && itinerary.timeOfActivity("Lunch") != LUNCH_TIME) {
+                return GameTree.INFINITY;
+            }
 
             if(itinerary.activities.size() != numberOfActivities) {
                 scheduleFull = false;
@@ -168,7 +170,7 @@ public class Schedule
     public class Itinerary
     {
         private TreeMap<Integer, Activity> activities;
-        private int currentTimeSlotMinutesFromMidnight = 540; // Starts at 9am
+        private int currentTimeSlotMinutesFromMidnight = START_OF_DAY; // Starts at 9am
 
         public Itinerary() {
             this.activities = new TreeMap<>();
@@ -188,7 +190,6 @@ public class Schedule
         }
 
         public int timeOfActivity(String activityName){
-            this.activities = new TreeMap<>();
             Iterator it = activities.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pair = (Map.Entry) it.next();
