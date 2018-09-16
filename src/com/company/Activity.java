@@ -15,17 +15,11 @@ public class Activity
         this.durationMinutes = activity.getDurationMinutes();
     }
 
-    public Activity clone() throws CloneNotSupportedException
-    {
-        Activity clone = (Activity)super.clone();
-        return clone;
-    }
-
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Activity activity = (Activity) o;
-        return this.name == activity.name
+        return this.name.equals(activity.name)
                 && this.durationMinutes == activity.durationMinutes;
     }
 

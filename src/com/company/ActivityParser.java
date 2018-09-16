@@ -12,15 +12,18 @@ public class ActivityParser
 {
     public static Activity parseActivityFromLine(String inputLine)
     {
-        String lastWord = inputLine.substring(inputLine.lastIndexOf(" ")+1);
-        if(lastWord.equals("sprint")) {
+        String timeString = inputLine.substring(inputLine.lastIndexOf(" ") + 1);
+        String activityName = inputLine.substring(0, inputLine.lastIndexOf(" "));
+        if(timeString.equals("sprint")) {
             // TODO
+            return new Activity(activityName, 15);
         }
         else {
+            String timeInMinutesString = timeString.substring(0, timeString.indexOf("m"));
+            int timeInMinutes = Integer.parseInt(timeInMinutesString);
+            return new Activity(activityName, timeInMinutes);
             // TODO
         }
-
-        return null;
     }
 
     public static ArrayList<Activity> parseActivities(String fileName)
@@ -33,8 +36,9 @@ public class ActivityParser
                 activities.add(parseActivityFromLine(line));
             });
         } catch (IOException e) {
+            System.out.println(e.toString());
             //error happened
         }
-        return null;
+        return activities;
     }
 }

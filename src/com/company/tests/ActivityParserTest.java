@@ -14,6 +14,6 @@ class ActivityParserTest {
         String activityString = "Clay pigeon shooting 60min";
         Activity testActivity = ActivityParser.parseActivityFromLine(activityString);
 
-        assertEquals(controlActivity.equals(testActivity), true);
+        assertEquals(true, controlActivity.equals(testActivity));
     }
 }

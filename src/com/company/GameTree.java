@@ -1,5 +1,6 @@
 package com.company;
 
+import com.sun.org.apache.xerces.internal.dom.ChildNode;
 import sun.reflect.generics.tree.Tree;
 
 import java.lang.reflect.Array;
@@ -9,6 +10,8 @@ import java.util.LinkedList;
 
 public class GameTree
 {
+    public static final int INFINITY = 100000;
+
     public TreeNode root;
 
     public GameTree (Schedule rootState) {
@@ -43,74 +46,23 @@ public class GameTree
         }
     }
 
-//    public static GameTree generateTree(Schedule initialSchedule, int searchDepth)
-//    {
-//        int reachedDepth = 0;
-//
-//        GameTree tree = new GameTree(initialSchedule);
-//
-//        // list of leaf nodes that need to be expanded into new sub-trees
-//        Stack<TreeNode> leafNodes = new LinkedList<>();
-//
-//        // swap buffer for repopulating leafNodes
-//        Stack<GameTree.TreeNode> buffer = new LinkedList<>();
-//
-//        leafNodes.add(tree.root);
-//
-//        while(reachedDepth < searchDepth)
-//        {
-//            // for each leaf node, grow its children and append them
-//            while(leafNodes.peek() != null)
-//            {
-//                growTree(leafNodes.getFirst());
-//
-//                for(GameTree.TreeNode i : leafNodes.getFirst().children)
-//                {
-//                    GameTree.TreeNode temp = new GameTree.TreeNode();
-//
-//                    // needed in order to correctly display parent moves
-//                    temp.children = i.children;
-//                    temp.parent = i.parent;
-//                    temp.state = i.state.clone();
-//                    temp.state.parentMove.clear();
-//
-//                    // these generated children are going to be the new leaf nodes to grow
-//                    buffer.addLast(temp);
-//                }
-//
-//                leafNodes.removeFirst();
-//            }
-//
-//            // populate the next generation of leaf nodes
-//            for(GameTree.TreeNode i : buffer)
-//            {
-//                leafNodes.addLast(i);
-//            }
-//
-//            buffer.clear();
-//
-//            reachedDepth++;
-//        }
-//
-//        return tree;
-//    }
-//
-//    // Given a node, generate its next "generation" of childred
-//    public static void growTree(GameTree.TreeNode root)
-//    {
-//        Deque<Schedule> resultingSchedules = generateFutureSchedules(root.state);
-//
-//        GameTree tempTree = new GameTree(root.state);
-//
-//        for (Schedule i : resultingSchedules) {
-//            tempTree.addNode(i, root);
-//        }
-//
-//        root = tempTree.root;
-//    }
 
+    public int idaStar()
+    {
+        int threshold = root.getSchedule().evaluate();
+        while(true) {
+            int temp = idaStarSearch(root, 0, threshold);
+            if(temp == Schedule.FEASIBLE_SCHEDULE) {
+                return Schedule.FEASIBLE_SCHEDULE;
+            }
+            if(temp == INFINITY) {
+                return -1;
+            }
+            threshold = temp;
+        }
+    }
 
-    public static int idaStarSearch(TreeNode node, int g, int threshold)
+    public int idaStarSearch(TreeNode node, int g, int threshold)
     {
         int evaluation = node.getSchedule().evaluate();
         int f = g + evaluation;
@@ -119,12 +71,14 @@ public class GameTree
             return f;
         }
         if(evaluation == Schedule.FEASIBLE_SCHEDULE) {
+            node.getSchedule().printSchedule();
             return Schedule.FEASIBLE_SCHEDULE;
         }
-        int min = Integer.MAX_VALUE;
+        int min = INFINITY;
         for(TreeNode tempNode : nextNodes(node)) {
             int temp = idaStarSearch(tempNode, g, threshold);
             if(temp == Schedule.FEASIBLE_SCHEDULE) {
+                // TODO callback function to handle printing of schedule
                 return Schedule.FEASIBLE_SCHEDULE;
             }
             if(temp < min) {
@@ -135,22 +89,28 @@ public class GameTree
     }
 
     // given a board layout, generate all the possible moves in a given round for it
-    public static ArrayList<TreeNode> nextNodes(TreeNode parent){
+    public ArrayList<TreeNode> nextNodes(TreeNode parent){
         Schedule child;
 
         Schedule startingSchedule = parent.getSchedule();
 
-        ArrayList<Activity> remainingActivities = startingSchedule.getRemainingActivitiesForCurrentTeam();
+        ArrayList<Activity> remainingActivities = new ArrayList<>();
+        for(Activity activity : startingSchedule.getRemainingActivitiesForCurrentTeam()) {
+            remainingActivities.add(new Activity(activity));
+        }
 
         ArrayList<TreeNode> nodes = new ArrayList<>();
         for(Activity activity : remainingActivities) {
             if(startingSchedule.isActivityFree(activity)) {
                 child = new Schedule(startingSchedule);
                 child.addActivity(activity);
-                nodes.add(new TreeNode(startingSchedule, parent));
+                TreeNode childNode = new TreeNode(child, parent);
+                parent.children.add(childNode);
+                nodes.add(childNode);
             }
         }
 
         return nodes;
     }
+
 }
